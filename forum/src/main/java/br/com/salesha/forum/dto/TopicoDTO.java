@@ -16,7 +16,7 @@ public class TopicoDTO {
 		
 	}
 	
-	TopicoDTO(Topico topico) {
+	public TopicoDTO(Topico topico) {
 		this.id = topico.getId();
 		this.titulo = topico.getTitulo();
 		this.mensagem = topico.getMensagem();
