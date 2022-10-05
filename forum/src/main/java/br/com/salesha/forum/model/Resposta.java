@@ -31,6 +31,16 @@ public class Resposta {
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		return result;
 	}
+	
+	
+	
+	@Override
+	public String toString() {
+		return "Resposta [id=" + id + ", mensagem=" + mensagem + ", topico=" + topico + ", dataCriacao=" + dataCriacao
+				+ ", autor=" + autor + ", solucao=" + solucao + "]";
+	}
+
+
 
 	@Override
 	public boolean equals(Object obj) {
