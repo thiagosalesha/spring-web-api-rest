@@ -6,6 +6,8 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.*;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -15,15 +17,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import br.com.salesha.forum.controller.form.AtualizaTopicoForm;
 import br.com.salesha.forum.controller.form.TopicoForm;
 import br.com.salesha.forum.dto.DetalharTopicoDTO;
-import br.com.salesha.forum.dto.RespostaDTO;
 import br.com.salesha.forum.dto.TopicoDTO;
-import br.com.salesha.forum.model.Resposta;
 import br.com.salesha.forum.model.Topico;
 import br.com.salesha.forum.repository.CursoRepository;
 import br.com.salesha.forum.repository.RespostasRepository;
@@ -43,12 +44,17 @@ public class TopicosController {
 	RespostasRepository respostaRepository;
 	
 	@GetMapping
-	public List<TopicoDTO> lista(String nomeCurso) {
+	public Page<TopicoDTO> lista(@RequestParam(required = false) String nomeCurso, @RequestParam int pagina, 
+			@RequestParam int qtd, @RequestParam String ordenacao) {
+		
+		Pageable paginacao = PageRequest.of(pagina, qtd, Direction.DESC, ordenacao);
+	
+		
 		if(nomeCurso == null) {
-			List<Topico> topicos = topicoRepository.findAll();
+			Page<Topico> topicos = topicoRepository.findAll(paginacao);
 			return TopicoDTO.toTopico(topicos);
 		} else {
-			List<Topico> topicos = topicoRepository.findByCursoNome(nomeCurso);
+			Page<Topico> topicos = topicoRepository.findByCursoNome(nomeCurso, paginacao);
 			return  TopicoDTO.toTopico(topicos);
 		}
 	}
