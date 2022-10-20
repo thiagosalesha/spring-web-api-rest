@@ -6,8 +6,11 @@ import java.util.List;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.*;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -44,12 +47,11 @@ public class TopicosController {
 	RespostasRepository respostaRepository;
 	
 	@GetMapping
-	public Page<TopicoDTO> lista(@RequestParam(required = false) String nomeCurso, @RequestParam int pagina, 
-			@RequestParam int qtd, @RequestParam String ordenacao) {
-		
-		Pageable paginacao = PageRequest.of(pagina, qtd, Direction.DESC, ordenacao);
-	
-		
+	@Cacheable(value = "listaTopicos")
+	public Page<TopicoDTO> lista(@RequestParam(required = false) String nomeCurso,
+			@PageableDefault(sort = "dataCriacao", direction = Direction.DESC,
+			page = 0, size = 10) Pageable paginacao) {
+			
 		if(nomeCurso == null) {
 			Page<Topico> topicos = topicoRepository.findAll(paginacao);
 			return TopicoDTO.toTopico(topicos);
@@ -60,6 +62,8 @@ public class TopicosController {
 	}
 	
 	@PostMapping
+	@Transactional
+	@CacheEvict(value = "listaTopicos", allEntries = true)
 	public ResponseEntity<TopicoDTO> cadastrar(@RequestBody  @Valid TopicoForm form, UriComponentsBuilder uriBuilder) {
 		Topico topico = form.toTopico(cursoRepository);
 		topicoRepository.save(topico);
@@ -68,6 +72,7 @@ public class TopicosController {
 	}
 	
 	@GetMapping("/detalhar/{id}")
+	@Transactional
 	public DetalharTopicoDTO detalhar(@PathVariable Long id) {
 		Topico topico = topicoRepository.getReferenceById(id);		
 		return new DetalharTopicoDTO(topico);
@@ -82,6 +87,7 @@ public class TopicosController {
 	}
 	
 	@DeleteMapping("/{id}") 
+	@Transactional
 	public ResponseEntity<?> deletar(@PathVariable Long id){
 		topicoRepository.deleteById(id);
 		return ResponseEntity.ok("Fim");
