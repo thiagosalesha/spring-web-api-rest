@@ -7,7 +7,8 @@
     - Bean Validation
     - Tratamento de Erro
     - Implementação do CRUD
+    - Implementação de Autorização e Autenticação com Spring Security
     
     Curso: Spring Boot API REST (Construindo uma API) - Alura
     
-    Próxima etapa: Implementação de segurança na API.
+    Próxima etapa: Gerar token com JWT
