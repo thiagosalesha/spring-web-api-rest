@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.salesha.forum.config.security.TokenService;
 import br.com.salesha.forum.controller.form.LoginForm;
+import br.com.salesha.forum.dto.TokenDTO;
 
 @RestController
 @RequestMapping("/auth")
@@ -27,15 +28,14 @@ public class AutenticacaoController {
 	private TokenService tokenService;
 	
 	@PostMapping
-	public ResponseEntity<?> autenticar(@RequestBody @Valid LoginForm form){
+	public ResponseEntity<TokenDTO> autenticar(@RequestBody @Valid LoginForm form){
 		
 		UsernamePasswordAuthenticationToken dadosLogin = form.converter();
 		
 		try {
 			Authentication authenticate = authManager.authenticate(dadosLogin);
 			String token = tokenService.gerarToken(authenticate);
-			System.out.println(token);
-			return ResponseEntity.ok().build();
+			return ResponseEntity.ok(new TokenDTO(token, "Bearer"));
 		} catch (Exception e) {
 			return ResponseEntity.badRequest().build();
 		}
